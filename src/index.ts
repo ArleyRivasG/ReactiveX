@@ -1,38 +1,38 @@
 import { Observable, Observer } from 'rxjs';
 
-
 const observer: Observer<any> = {
-    next : value => console.log('siguiente [next]: ', value),
-    error: error => console.warn('error [obs]: ', error),
-    complete: () => console.info('Completad [obs]')
+    next : value => console.log('next: ', value),
+    error: error => console.warn('error: ', error),
+    complete: () => console.info('completado')
 };
 
-const obs$ =  new Observable <string>( subscriber =>{
+const intervalo$ = new Observable<number>(subscriber => {
+    let count = 1;
+   const interval = setInterval( () =>{
+            subscriber.next(count);
+            count++;
+            console.log(count);
+    }, 1000);
+
+    return() => {
+        clearInterval(interval);
+        console.log('Intérvalo destruido');
+    }
+
+
+
+});
+
+const subs1 = intervalo$.subscribe(num => console.log('Num: ', num));
+const subs2 = intervalo$.subscribe(num => console.log('Num: ', num));
+
+setTimeout(()=>{
+    subs1.unsubscribe(); //Cancelamos la subscription
+    subs2.unsubscribe(); //Cancelamos la subscription
     
-    subscriber.next('world');
-    subscriber.next('mundo');
-    
-    //Forzar un error
-    // const a = undefined;
-    // a.nombre = 'Arley;'
+    console.log('completado Timeout');
 
-    subscriber.complete(); //finaliza las emiciones del observable
-    subscriber.next('hello');
-}); 
-
-//subscripciones son entes que estan pendientes a las emiciones del Observable
-//para que un Observable se ejecute debe tener al menos una subscripcion
-
-                    //Sin OBSERVER
-// obs$.subscribe(   
-
-//     valor => console.log('next: ',   valor),
-//     error => console.warn('error: ', error),
-//     () => console.info('Completado')
-
-// );
-
-                    // CON OBSERVER
-obs$.subscribe( observer );
+}, 5000);
 
 
+//Cada subscribe realiza una nueva instancia del Observable
