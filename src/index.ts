@@ -10,21 +10,22 @@ const intervalo$ = new Observable<number>(subscriber => {
     let count = 1;
    const interval = setInterval( () =>{
             subscriber.next(count);
-            count++;
             console.log(count);
+            count++;
     }, 1000);
 
-    return() => {
+    setTimeout(()=>{
+        subscriber.complete(); //finaliza los subscribe y dispara el return
+    }, 2500)
+
+    return() => { //se ejecuta por cada unsubscribe (cada instancia)
         clearInterval(interval);
         console.log('Intérvalo destruido');
     }
-
-
-
 });
 
-const subs1 = intervalo$.subscribe(num => console.log('Num: ', num));
-const subs2 = intervalo$.subscribe(num => console.log('Num: ', num));
+const subs1 = intervalo$.subscribe(observer);
+const subs2 = intervalo$.subscribe(observer);
 
 setTimeout(()=>{
     subs1.unsubscribe(); //Cancelamos la subscription
@@ -32,7 +33,9 @@ setTimeout(()=>{
     
     console.log('completado Timeout');
 
-}, 5000);
+}, 6000);
 
 
 //Cada subscribe realiza una nueva instancia del Observable
+
+//el .complete() no es lo mismo que el .unsubscribe()
