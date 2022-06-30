@@ -29,7 +29,7 @@ const subs2 = intervalo$.subscribe(observer);
 const subs3 = intervalo$.subscribe(observer);
 
 subs1.add(subs2);  //al add los otros subs solo hacemos un llamada al .complete()
-subs1.add(subs3);
+subs2.add(subs3);
      
 setTimeout(()=>{
      // subs1.unsubscribe(); //Cancelamos la subscription
