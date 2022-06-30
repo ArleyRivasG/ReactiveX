@@ -1,41 +1,33 @@
-import { Observable, Observer } from 'rxjs';
+import { Observable, Observer, Subject } from 'rxjs';
 
 const observer: Observer<any> = {
-    next : value => console.log('next: ', value),
+    next: value => console.log('next: ', value),
     error: error => console.warn('error: ', error),
     complete: () => console.info('completado')
 };
 
-const intervalo$ = new Observable<number>(subscriber => {
-    let count = 1;
-   const interval = setInterval( () =>{
-            subscriber.next(count);
-            console.log(count);
-            count++;
-    }, 1000);
 
-    setTimeout(()=>{
-        subscriber.complete(); //finaliza los subscribe y dispara el return
-    }, 2500)
+const intervalo$ = new Observable<number>(subs => {
 
-    return() => { //se ejecuta por cada unsubscribe (cada instancia)
-        clearInterval(interval);
-        console.log('Intérvalo destruido');
-    }
+    const intervalID = setInterval(
+        () => subs.next( Math.random()), 3000
+    );
+
+    return () => clearInterval( intervalID );
+
 });
 
-const subs1 = intervalo$.subscribe(observer);
-const subs2 = intervalo$.subscribe(observer);
+/*
+* 1. Casteo múltiple = muchas subscripciones subjetas al mismo observable, misma información para todos los subscribe 
+* 2. Tambien es un observer 
+* 3. puede mandar el next, error y complete
+*/
 
-setTimeout(()=>{
-    subs1.unsubscribe(); //Cancelamos la subscription
-    subs2.unsubscribe(); //Cancelamos la subscription
-    
-    console.log('completado Timeout');
+const subject$ = new Subject();
+intervalo$.subscribe( subject$ );
 
-}, 6000);
+// const subs1 = intervalo$.subscribe(rnd => console.log('subs1', rnd));
+// const subs2 = intervalo$.subscribe(rnd => console.log('subs2', rnd));
 
-
-//Cada subscribe realiza una nueva instancia del Observable
-
-//el .complete() no es lo mismo que el .unsubscribe()
+const subs1 = subject$.subscribe(rnd => console.log('subs1', rnd)); //las subscripciones pasan a ser las mismas
+const subs2 = subject$.subscribe(rnd => console.log('subs2', rnd));
