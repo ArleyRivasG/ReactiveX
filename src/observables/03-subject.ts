@@ -38,7 +38,7 @@ const subs2 = subject$.subscribe(observer);
 
 setTimeout(() => {
 
-    subject$.next(10);
+    subject$.next(10); //hot observable
     subject$.complete(); //completa el subject mas no el intervalo$
     subscriptionSubject.unsubscribe(); //completa
 
